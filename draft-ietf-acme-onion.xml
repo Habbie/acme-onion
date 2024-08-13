@@ -56,7 +56,7 @@
         it requires special consideration to validate control of one such that ACME could be used on ".onion"
         Special-Use Domain Names.</t>
       <t>In order to allow ACME to be utilised to issue certificates to ".onion" Special-Use Domain Names this document
-        specifies challenges suitable to validate control of these Special-Use Domain Names. Additionally this document
+        specifies challenges suitable to validate control of these Special-Use Domain Names. Additionally, this document
         defines an alternative to the DNS Certification Authority Authorization (CAA) Resource Record
         <xref target="RFC8659"/> that can be used with ".onion" Special-Use Domain Names.</t>
 
@@ -74,9 +74,9 @@
       <name>Identifier</name>
       <t><xref target="RFC8555"/> defines the "dns" identifier type. This identifier type <bcp14>MUST</bcp14> be used
         when requesting a certificate for a ".onion" Special-Use Domain Name. The value of identifier
-        <bcp14>MUST</bcp14> be the textual representation as defined in <xref target="tor-address-spec"/> §3. The value
-        <bcp14>MAY</bcp14> include subdomain labels. Version 2 addresses <bcp14>MUST NOT</bcp14> be used as these are
-        now considered insecure.</t>
+        <bcp14>MUST</bcp14> be the textual representation as defined in
+        <xref target="tor-address-spec" section=".onion" relative="#onion"/>. The value <bcp14>MAY</bcp14> include
+        subdomain labels. Version 2 addresses <bcp14>MUST NOT</bcp14> be used as these are now considered insecure.</t>
       <t>Example identifiers:</t>
       <sourcecode type="json">
 {
@@ -94,9 +94,9 @@
 
     <section>
       <name>Identifier Validation Challenges</name>
-      <t>The CA/Browser Forum Baseline Requirements <xref target="cabf-br" /> §B.2 define methods accepted by
-        the CA industry for validation of ".onion" Special-Use Domain Names. This document incorporates these methods
-        into ACME challenges.</t>
+      <t>The CA/Browser Forum Baseline Requirements (<xref target="cabf-br" section="B.2" relative="#page=124" />)
+        define methods accepted by the CA industry for validation of ".onion" Special-Use Domain Names.
+        This document incorporates these methods into ACME challenges.</t>
       <section>
         <name>Existing challenges</name>
         <section>
@@ -106,26 +106,29 @@
         </section>
         <section>
           <name>Existing "http-01" Challenge</name>
-          <t>The "http-01" challenge is defined as in <xref target="RFC8555"/> §8.3 may be used to validate a ".onion"
-            Special-Use Domain Names, with the modifications defined in this standard.</t>
-          <t>The ACME server <bcp14>SHOULD</bcp14> follow redirects; note that these may be redirects to non ".onion"
-            services, and the server <bcp14>SHOULD</bcp14> honour these.</t>
+          <t>The "http-01" challenge is defined as in <xref target="RFC8555" section="8.3"/> can be used to validate a
+            ".onion" Special-Use Domain Names, with the modifications defined in this standard.</t>
+          <t>The ACME server <bcp14>SHOULD</bcp14> follow redirects; note that these <bcp14>MAY</bcp14> be redirects to
+            non ".onion" services, and the server <bcp14>SHOULD</bcp14> honour these.</t>
         </section>
         <section>
           <name>Existing "tls-alpn-01" Challenge</name>
-          <t>The "tls-alpn-01" challenge is defined as in <xref target="RFC8737"/> may be used to validate a ".onion"
+          <t>The "tls-alpn-01" challenge is defined as in <xref target="RFC8737"/> can be used to validate a ".onion"
             Special-Use Domain Names, with the modifications defined in this standard.</t>
         </section>
       </section>
       <section>
         <name>New "onion-csr-01" Challenge</name>
         <t>The two methods already defined in ACME and allowed by the CA/BF do not allow issuance of wildcard
-          certificates. This new validation method incorporates the specially signed CSR (as defined by
-          <xref target="cabf-br" /> § B.2.b) into ACME to allow for the issuance of wildcard certificates.</t>
+          certificates. A ".onion" Special-Use Domain Name can have subdomains (just like any other domain in the DNS),
+          and a site operator may find it useful to have one certificate for all virtual hosts on their site.
+          This new validation method incorporates the specially signed CSR (as defined by
+          <xref target="cabf-br" section="B.2.b" relative="#page=124"/>) into ACME to allow for the issuance of
+          wildcard certificates.</t>
         <t>To this end a new challenge type called "onion-csr-01" is defined, with the following fields:</t>
         <dl>
           <dt>type (required, string)</dt>
-          <dd>The string "onion-csr-01"</dd>
+          <dd>The string <tt>onion-csr-01</tt></dd>
           <dt>nonce (required, string)</dt>
           <dd>A Base64 <xref target="RFC4648"/> encoded nonce, including padding characters.
             It <bcp14>MUST</bcp14> contain at least 64 bits of entropy. It <bcp14>MUST NOT</bcp14> be valid for more
@@ -146,10 +149,10 @@
           following additional extension attributes and signing it with the private key of the ".onion" Special-Use
           Domain Name:</t>
         <ul>
-          <li>A caSigningNonce attribute containing the nonce provided in the challenge. This <bcp14>MUST</bcp14>
-            be raw bytes, and not the base64 encoded value provided in the challenge object.</li>
-          <li>An applicantSigningNonce containing a nonce generated by the client. This <bcp14>MUST</bcp14> have at
-            least 64 bits of entropy. This <bcp14>MUST</bcp14> be raw bytes.</li>
+          <li>A <tt>caSigningNonce</tt> attribute containing the nonce provided in the challenge. This
+            <bcp14>MUST</bcp14> be raw bytes, and not the base64 encoded value provided in the challenge object.</li>
+          <li>An <tt>applicantSigningNonce</tt> containing a nonce generated by the client. This <bcp14>MUST</bcp14>
+            have at least 64 bits of entropy. This <bcp14>MUST</bcp14> be raw bytes.</li>
         </ul>
         <t>These additional attributes have the following format</t>
         <sourcecode type="asn.1">
@@ -179,7 +182,7 @@ applicantSigningNonce ATTRIBUTE ::= {
           The public key presented in this CSR <bcp14>MUST</bcp14> be the public key corresponding to the ".onion"
           Special-Use Domain Name being validated. It <bcp14>MUST NOT</bcp14> be the same public key presented in the
           CSR to finalize the order.</t>
-        <t>Client respond with the following object to validate the challenge</t>
+        <t>Client respond with the following object to validate the challenge:</t>
         <dl>
           <dt>csr (required, string)</dt>
           <dd>
@@ -224,23 +227,28 @@ Content-Type: application/jose+json
         it will use to connect these services will not be able to obtain a certificate using http-01 or tls-alpn-01,
         nor enforce CAA with any validation method.</t>
       <t>To this end, an additional field in the challenge object is defined to allow the ACME server to advertise the
-        Ed25519 public key it will use (as per <xref target="tor-rend-spec-v3"/> INTRO-AUTH) to authenticate itself when
-        retrieving the hidden service descriptor.</t>
+        Ed25519 public key it will use (as per
+        <xref target="tor-rend-spec-v3" section="&quot;Authentication during the introduction phase&quot;" relative="introduction-protocol.html#INTRO-AUTH" />) to
+        authenticate itself when retrieving the hidden service descriptor.</t>
       <dl>
         <dt>authKey (optional, object)</dt>
         <dd>The Ed25519 public key encoded as per <xref target="RFC8037"/>.</dd>
       </dl>
       <t>ACME servers <bcp14>MUST NOT</bcp14> use the same public key with multiple hidden services.
         ACME servers <bcp14>MAY</bcp14> re-use public keys for re-validation of the same hidden service.</t>
-      <t>There is no method to communicate to the CA that client authentication is required; instead the ACME server
-        <bcp14>MUST</bcp14> attempt to calculate its CLIENT-ID as per <xref target="tor-rend-spec-v3"/> FIRST-LAYER-CLIENT-BEHAVIOR.
-        If no "auth-client" line in the first layer hidden service descriptor matches the computed client-id then the server
-        <bcp14>MUST</bcp14> assume that the hidden service does not require client authentication and proceed accordingly.</t>
+      <t>There is no method to communicate to the CA that client authentication is necessary; instead the ACME server
+        <bcp14>MUST</bcp14> attempt to calculate its CLIENT-ID as per
+        <xref target="tor-rend-spec-v3" section="&quot;Client Behaviour&quot;" relative="hsdesc-encrypt.html#FIRST-LAYER-CLIENT-BEHAVIOR"/>.
+        If no <tt>auth-client</tt> line in the first layer hidden service descriptor matches the computed client-id
+        then the server <bcp14>MUST</bcp14> assume that the hidden service does not require client authentication and
+        proceed accordingly.</t>
       <t>In the case the Ed25519 public key is novel to the client it will have to resign and republish its hidden service
         descriptor. It <bcp14>SHOULD</bcp14> wait some (indeterminate) amount of time for the new descriptor to
         propagate the Tor hidden service directory servers, before proceeding with responding to the challenge.
-        This should take no more than a few minutes. CAs <bcp14>MUST NOT</bcp14> expire challenges before a reasonable
-        time to allow publication of the new descriptor (this document suggests at least 30 minutes).</t>
+        This should take no more than a few minutes. This specification does not set a fixed time as changes in the
+        operation of the Tor network can affect this propagation time in the future. ACME servers
+        <bcp14>MUST NOT</bcp14> expire challenges before a reasonable time to allow publication of the new descriptor -
+        this document suggests at least 30 minutes however it is entirely up to operator preference.</t>
     </section>
 
     <section>
@@ -253,18 +261,19 @@ Content-Type: application/jose+json
 
     <section>
       <name>Certification Authority Authorization (CAA)</name>
-      <t>".onion" Special-Use Domain Name are not part of the DNS, and as such a variation on CAA <xref target="RFC8659"/> is required
-        to allow restrictions to be placed on certificate issuance.</t>
+      <t>".onion" Special-Use Domain Name are not part of the DNS, and as such a variation on CAA <xref target="RFC8659"/>
+        is necessary to allow restrictions to be placed on certificate issuance.</t>
       <t>To this end a new field is added to the second layer hidden service descriptor
-        <xref target="tor-rend-spec-v3" /> § 2.5.2.2. with the following format:</t>
+        <xref target="tor-rend-spec-v3" relative="hsdesc-encrypt.html#second-layer-plaintext" section="&quot;Second layer plaintext format&quot;" />
+        with the following format:</t>
       <sourcecode>
 "caa" SP flags SP tag SP value NL
 [Any number of times]
       </sourcecode>
-      <t>The contents of "flag", "tag", and "value" are as per <xref target="RFC8659"/> § 4.1.1. Multiple CAA records may
-       be present, as is the case in the DNS. CAA records in a hidden service descriptor are to be treated the same by
-       CAs as if they had been in the DNS for the ".onion" Special-Use Domain Name.</t>
-      <t>A hidden service's second layer descriptor using CAA may look something like the following:</t>
+      <t>The contents of "flag", "tag", and "value" are as per <xref target="RFC8659" section="4.1.1"/>.
+        Multiple CAA records <bcp14>MAY</bcp14> be present, as is the case in the DNS. CAA records in a hidden service
+        descriptor are to be treated the same by CAs as if they had been in the DNS for the ".onion" Special-Use Domain Name.</t>
+      <t>A hidden service's second layer descriptor using CAA could look something like the following:</t>
       <sourcecode>
 create2-formats 2
 single-onion-service
@@ -276,18 +285,18 @@ introduction-point AwAGsAk5nSMpAhRqhMHbTFCTSlfhP8f5PqUhe6DatgMgk7kSL3KHCZUZ3C6tX
       <section>
         <name>Relevant Resource Record Set</name>
         <t>In the absence of the possibility for delegation of subdomains from a ".onion" Special-Use Domain Name as
-          there is in the DNS there is no need, nor indeed any method available to search up the DNS tree for a relevant
-          CAA record set. Similarly, it is also impossible to check CAA records on the "onion" Special-Use TLD, as it
-          does not exist in any form except as described in <xref target="RFC7686"/>, so implementors must not look here
-          either.</t>
-        <t>Instead all subdomains under a ".onion" Special-Use Domain Name share the same CAA record set. That is all of
-          these share a CAA record set with "a.onion":</t>
+          there is in the DNS there is no need, nor indeed any method available, to search up the DNS tree for a
+          relevant CAA record set. Similarly, it is also impossible to check CAA records on the "onion" Special-Use TLD,
+          as it does not exist in any form except as described in <xref target="RFC7686"/>, so implementors
+          <bcp14>MUST</bcp14> not look here either.</t>
+        <t>Instead all subdomains under a ".onion" Special-Use Domain Name share the same CAA record set. That is,
+          all of these share a CAA record set with "a.onion":</t>
         <ul>
           <li>b.a.onion</li>
           <li>c.a.onion</li>
           <li>e.d.a.onion</li>
         </ul>
-        <t>But these do not:</t>
+        <t>but these do not:</t>
         <ul>
           <li>b.c.onion</li>
           <li>c.d.onion</li>
@@ -296,49 +305,51 @@ introduction-point AwAGsAk5nSMpAhRqhMHbTFCTSlfhP8f5PqUhe6DatgMgk7kSL3KHCZUZ3C6tX
       </section>
       <section>
         <name>When to check CAA</name>
-        <t>If the hidden service has client authentication enabled then it will be impossible for the CAA to decrypt
-          the second layer descriptor to read the CAA records until the CAAs public key has been added to first layer
-          descriptor. To this end a CA <bcp14>SHOULD</bcp14> wait until the client responds to an authorization, and
-          treat this as indication that their public key has been added and that the CA will be able to decrypt the
-          second layer descriptor.</t>
+        <t>If the hidden service has client authentication enabled then it will be impossible for the ACME server to
+          decrypt the second layer descriptor to read the CAA records until the ACME server's public key has been added
+          to the first layer descriptor. To this end an ACME server <bcp14>SHOULD</bcp14> wait until the client responds
+          to an authorization before checking CAA, and treat this response as indication that their public key has been
+          added and that the ACME server will be able to decrypt the second layer descriptor.</t>
       </section>
       <section>
         <name>Preventing mis-issuance by unknown CAs</name>
-        <t>As the CAA records are in the second layer descriptor and in the case of a hidden service requiring client
-          authentication it is impossible to read them without the hidden service trusting a CA's public key, a method is
-          required to signal that there are CAA records present (but not reveal their contents, which may disclose
-          unwanted information about the hidden service operator).</t>
+        <t>In the case of a hidden service requiring client authentication it is impossible to read them without the
+          hidden service trusting a ACME server's public key - as the CAA records are in the second layer descriptor.
+          A method is necessary to signal that there are CAA records present (but not reveal their contents which
+          - in certain circumstances - would disclose unwanted information about the hidden service operator).</t>
         <t>To this end a new field is added to the first layer hidden service descriptor
-          <xref target="tor-rend-spec-v3" /> § 2.5.1.2. with the following format:</t>
+          <xref target="tor-rend-spec-v3" section="&quot;First layer plaintext format&quot;" relative="hsdesc-encrypt.html#first-layer-plaintext" />
+          with the following format:</t>
         <sourcecode>
 "caa-critical" NL
 [At most once]
         </sourcecode>
-        <t>If a CA encounters this flag it <bcp14>MUST NOT</bcp14> proceed with issuance until it can decrypt and
-          parse the CAA records from the second layer descriptor.</t>
+        <t>If an ACME server encounters this flag it <bcp14>MUST NOT</bcp14> proceed with issuance until it can decrypt
+          and parse the CAA records from the second layer descriptor.</t>
       </section>
       <section>
         <name>Alternative in-band presentation of CAA</name>
-        <t>A CA may not be willing to operate the infrastructure required to fetch, decode, and verify Tor hidden service
-          descriptors in order to check CAA records. To this end a method to signal CAA policies in-band of ACME is defined.</t>
-        <t>If a hidden service does use this method to provide CAA records to a CA it <bcp14>SHOULD</bcp14> still publish
-          CAA records if its CAA record set includes "iodef", "contactemail", or "contactphone" so that this information
-          is still publicly accessible. A hidden service operator <bcp14>MAY</bcp14> also not wish to publish a CAA
-          record set in its service descriptor to avoid revealing information about the service operator.</t>
-        <t>If a CA receives a validly signed CAA record set in the finalize request it need not check the CAA set in
-          the hidden service descriptor and can proceed with issuance on the basis of the client provided CAA record set
-          only. A CA, however, is not required to do anything with the client provided record set, and is free to always
-          fetch the record set from the service descriptor.</t>
+        <t>An ACME server might be unwilling to operate the infrastructure required to fetch, decode, and verify Tor
+          hidden service descriptors in order to check CAA records. To this end a method to signal CAA policies in-band
+          of ACME is defined.</t>
+        <t>If a hidden service does use this method to provide CAA records to an ACME server it <bcp14>SHOULD</bcp14>
+          still publish CAA records if its CAA record set includes "iodef", "contactemail", or "contactphone" so that
+          this information is still publicly accessible. A hidden service operator <bcp14>MAY</bcp14> also not wish to
+          publish a CAA record set in its service descriptor to avoid revealing information about the service operator.</t>
+        <t>If an ACME server receives a validly signed CAA record set in the finalize request it need not check the CAA
+          set in the hidden service descriptor and can proceed with issuance on the basis of the client provided CAA
+          record set only. An ACME server <bcp14>MAY</bcp14> ignore the client provided record set, and is free to
+          always fetch the record set from the service descriptor.</t>
         <t>A new field is defined in the ACME finalize endpoint to contain the hidden service's CAA record set for each
           ".onion" Special-Use Domain Name in the order.</t>
         <dl>
           <dt>onionCAA (optional, dictionary of objects)</dt>
           <dd>
-            The CAA record set for each ".onion" Special-Use Domain Name in the order. The key is the ".onion" Special-Use
-            Domain Name, and the value is an object with the following fields.
+            The CAA record set for each ".onion" Special-Use Domain Name in the order. The key is the ".onion"
+            Special-Use Domain Name, and the value is an object with the following fields.
           </dd>
         </dl>
-        <t>The contents of the "onionCAA" object are:</t>
+        <t>The contents of the values of the "onionCAA" object are:</t>
         <dl>
           <dt>caa (required, string or null)</dt>
           <dd>
@@ -348,7 +359,7 @@ introduction-point AwAGsAk5nSMpAhRqhMHbTFCTSlfhP8f5PqUhe6DatgMgk7kSL3KHCZUZ3C6tX
           <dt>expiry (required, integer)</dt>
           <dd>
             The Unix timestamp at which this CAA record set will expire. This <bcp14>SHOULD NOT</bcp14> be more than
-            8 hours in the future. CAs <bcp14>MUST</bcp14> process this as at least a 64-bit integer to ensure
+            8 hours in the future. ACME servers <bcp14>MUST</bcp14> process this as at least a 64-bit integer to ensure
             functionality beyond 2038.
           </dd>
           <dt>signature (required, string)</dt>
@@ -363,19 +374,19 @@ introduction-point AwAGsAk5nSMpAhRqhMHbTFCTSlfhP8f5PqUhe6DatgMgk7kSL3KHCZUZ3C6tX
         <t>Where "|" is the ASCII character 0x7C, and expiry is the expiry field as a decimal string with no
           leading zeros.</t>
         <section>
-          <name>CAs requiring in-band CAA</name>
-          <t>If a CA does not support fetching a service's CAA record set from its service descriptor it, and the
-            ACME client does not provide an "onionCAA" object in its finalize request the CA <bcp14>MUST</bcp14> respond
-            with an "onionCAARequired" error to indicate this.</t>
+          <name>ACME servers requiring in-band CAA</name>
+          <t>If an ACME server does not support fetching a service's CAA record set from its service descriptor it,
+            and the ACME client does not provide an "onionCAA" object in its finalize request the ACME server
+            <bcp14>MUST</bcp14> respond with an "onionCAARequired" error to indicate this.</t>
           <t>Additionally, a new field is defined in the directory "meta" object to signal this.</t>
           <dl>
             <dt>inBandOnionCAARequired (optional, boolean)</dt>
             <dd>
-              If true, the CA requires the client to provide the CAA record set in the finalize request.
-              If false or absent the CA does not require the client to provide the CAA record set is this manner.
-            </dd>
+              If true, the ACME server requires the client to provide the CAA record set in the finalize request.
+              If false or absent the ACME server does not require the client to provide the CAA record set is this
+              manner.</dd>
           </dl>
-          <t>A directory of such a CA may look like</t>
+          <t>A directory of such a CA could look like</t>
           <sourcecode type="http">
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -402,7 +413,7 @@ Content-Type: application/json
 caa 128 issue "test.acmeforonions.org; validationmethods=onion-csr-01"
 caa 0 iodef "mailto:example@example.com"
           </sourcecode>
-          <t>The following would be submitted to the CA's finalize endpoint</t>
+          <t>The following would be submitted to the ACME server's finalize endpoint</t>
           <sourcecode type="http">
 POST /acme/order/TOlocE8rfgo/finalize
 Host: example.com
@@ -437,7 +448,7 @@ Content-Type: application/jose+json
       <section>
         <name>Validation Methods</name>
         <t>Per this document, one new entry has been added to the "ACME Validation Methods" registry defined in
-          <xref target="RFC8555"/> §9.7.8. This entry is defined below:</t>
+          <xref target="RFC8555" section="9.7.8"/>. This entry is defined below:</t>
         <table>
           <name>New entries</name>
           <thead>
@@ -461,7 +472,7 @@ Content-Type: application/jose+json
       <section>
         <name>Error Types</name>
         <t>Per this document, one new entry has been added to the "ACME Error Types" registry defined in
-          <xref target="RFC8555"/> §9.7.8. This entry is defined below:</t>
+          <xref target="RFC8555" section="9.7.8"/>. This entry is defined below:</t>
         <table>
           <name>New entries</name>
           <thead>
@@ -484,7 +495,7 @@ Content-Type: application/jose+json
       <section>
         <name>Directory Metadata Fields</name>
         <t>Per this document, one new entry has been added to the "ACME Directory Metadata Fields" registry defined in
-          <xref target="RFC8555"/> §9.7.8. This entry is defined below:</t>
+          <xref target="RFC8555" section="9.7.8"/>. This entry is defined below:</t>
         <table>
           <name>New entries</name>
           <thead>
@@ -507,6 +518,10 @@ Content-Type: application/jose+json
 
     <section anchor="Security">
       <name>Security Considerations</name>
+      <section>
+        <name>Security of the "onion-csr-01" challenge</name>
+        <t>The security considerations of <xref target="cabf-br"/> apply to issuance using the CSR method.</t>
+      </section>
       <section anchor="security-id-dns">
         <name>Use of "dns" identifier type</name>
         <t>The re-use of the "dns" identifier type for a Special-Use Domain Name not actually in the DNS infrastructure
@@ -516,21 +531,21 @@ Content-Type: application/jose+json
           Special-Use Domain Names, as CAs would not be able to resolve the identifier in the DNS.</t>
         <section>
           <name>"http-01" Challenge</name>
-          <t>The CA would follow the procedure set out in <xref target="RFC8555"/> §8.3 which specifies that the CA
-            should "Dereference the URL using an HTTP GET request". Given that ".onion" Special-Use Domain Names require
+          <t>The CA would follow the procedure set out in <xref target="RFC8555" section="8.3"/> which specifies that
+            the CA should "Dereference the URL using an HTTP GET request". Given that ".onion" Special-Use Domain Names require
             special handling to dereference, this de-referencing will fail, disallowing issuance.</t>
         </section>
         <section>
           <name>"tls-alpn-01" Challenge</name>
-          <t>The CA would follow the procedure set out in <xref target="RFC8737"/> §3 which specifies that the CA
-            "resolves the domain name being validated and chooses one of the IP addresses returned for validation".
+          <t>The CA would follow the procedure set out in <xref target="RFC8737" section="3"/> which specifies that the
+            CA "resolves the domain name being validated and chooses one of the IP addresses returned for validation".
             Given that ".onion" Special-Use Domain Names are not resolvable to IP addresses, this de-referencing will
             fail, disallowing issuance.</t>
         </section>
         <section>
           <name>"dns-01" Challenge</name>
-          <t>The CA would follow the procedure set out in <xref target="RFC8555"/> §8.4 which specifies that the CA
-            should "query for TXT records for the validation domain name".
+          <t>The CA would follow the procedure set out in <xref target="RFC8555" section="8.4"/> which specifies that
+            the CA should "query for TXT records for the validation domain name".
             Given that ".onion" Special-Use Domain Names are not present in the DNS infrastructure, this query will
             fail, disallowing issuance.</t>
         </section>
@@ -538,23 +553,35 @@ Content-Type: application/jose+json
       <section>
         <name>Key Authorization with "onion-csr-01"</name>
         <t>The "onion-csr-01" challenge does not make use of the key authorization string defined in
-          <xref target="RFC8555"/> §8.1. This does not weaken the integrity of authorizations.</t>
-        <t>The key authorization exists to ensure that whilst an attacker observing the validation channel may observe
+          <xref target="RFC8555" section="8.1"/>. This does not weaken the integrity of authorizations.</t>
+        <t>The key authorization exists to ensure that whilst an attacker observing the validation channel can observe
           the correct validation response, they cannot compromise the integrity of authorizations as the response
           can only be used with the account key for which it was generated. As the validation channel for this challenge
           is ACME itself, and ACME already requires that the request be signed by the account, the key authorization is
-          not required.</t>
+          not necessary.</t>
       </section>
       <section>
         <name>Use of Tor for non ".onion" domains</name>
         <t>An ACME server <bcp14>MUST NOT</bcp14> utilise Tor for the validation of non ".onion" domains, due to the
-          risk of possible exit hijacking.</t>
+          risk of exit hijacking.</t>
+      </section>
+      <section>
+        <name>Redirects with "http-01"</name>
+        <t>A site <bcp14>MAY</bcp14> redirect to another site when completing validation using the "http-01" challenge.
+          This redirect can be to either another ".onion" Special-Use Domain Name, or to a domain in the public DNS.
+          A site operator <bcp14>SHOULD</bcp14> consider the privacy implications of redirecting to a non ".onion"
+          site - namely that the ACME server operator will then be able to learn information about the site redirected to
+          that they would not if accessed via a ".onion" Special-Use Domain Name, such as its IP address. If the site
+          redirected to is on the same or an adjacent host to the ".onion" Special-Use Domain Name this reveals
+          information <xref target="tor-rend-spec-v3"/> was otherwise designed to protect.</t>
+        <t>If an ACME server receives a redirect to a domain in the public DNS it <bcp14>MUST NOT</bcp14> utilise Tor
+          to make a connection to it, due to the risk of exit hijacking.</t>
       </section>
       <section>
         <name>Security of CAA records</name>
         <t>The second layer descriptor is signed, encrypted and MACed in a way that only a party with access to the
           secret key of the hidden service could manipulate what is published there. For more information about this
-          process see <xref target="tor-rend-spec-v3"/> § 2.5.3.</t>
+          process see <xref target="tor-rend-spec-v3" section="&quot;Hidden service descriptors: encryption format&quot;" relative="hsdesc-encrypt.html" />.</t>
       </section>
       <section>
         <name>In-band CAA</name>
@@ -569,9 +596,9 @@ Content-Type: application/jose+json
       </section>
       <section>
         <name>Anonymity of the ACME client</name>
-        <t>ACME clients requesting certificates for ".onion" Special-Use Domain Names may expose the existence of a
-        hidden service on the host to unintended parties - even when features such as ECH
-          <xref target="I-D.ietf-tls-esni"/> are utilised, as the IP addresses of ACME servers are generally
+        <t>ACME clients requesting certificates for ".onion" Special-Use Domain Names can inadvertently expose the
+          existence of a hidden service on the host requesting certificates to unintended parties - even when features
+          such as ECH <xref target="I-D.ietf-tls-esni"/> are utilised, as the IP addresses of ACME servers are generally
           well-known, static, and not used for any other purpose.</t>
         <t>ACME clients <bcp14>SHOULD</bcp14> connect to ACME servers over the Tor network to alleviate this, preferring
         a hidden service endpoint if the CA provides such a service.</t>
@@ -606,7 +633,7 @@ Content-Type: application/jose+json
           </front>
         </reference>
 
-        <reference anchor="tor-rend-spec-v3" target="https://spec.torproject.org/rend-spec-v3">
+        <reference anchor="tor-rend-spec-v3" target="https://spec.torproject.org/rend-spec/index.html">
           <front>
             <title>Tor Rendezvous Specification - Version 3</title>
             <author>
@@ -615,7 +642,7 @@ Content-Type: application/jose+json
           </front>
         </reference>
 
-        <reference anchor="cabf-br" target="https://cabforum.org/wp-content/uploads/CA-Browser-Forum-BR-1.8.6.pdf">
+        <reference anchor="cabf-br" target="https://cabforum.org/working-groups/server/baseline-requirements/documents/CA-Browser-Forum-TLS-BR-2.0.6.pdf">
           <front>
             <title>Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates</title>
             <author>
@@ -646,7 +673,7 @@ Content-Type: application/jose+json
       <t>The reasons for utilising the "dns" identifier type in ACME and not defining a new identifier type for
         ".onion" s may not seem obvious at first glance. After all, ".onion" Special-Use Domain
         Names are not part of the DNS infrastructure and as such why should they use the "dns" identifier type?</t>
-      <t>The CA/Browser Forum Baseline Requirements <xref target="cabf-br"/> §B.2.a.ii define, and this standard allows,
+      <t><xref target="cabf-br" section="B.2.a.ii" relative="#page=124"/> defines, and this standard allows,
         using the "http-01" or "tls-alpn-01" validation methods already present in ACME (with some considerations).
         Given the situation of a web server placed behind a Tor terminating proxy (as per the setup suggested by the
         Tor project <xref target="onion-services-setup"/>), existing ACME tooling can be blind to the fact that a
